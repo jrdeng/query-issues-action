@@ -1,0 +1,32 @@
+name: 'Query Issues'
+description: 'Query issues from the specified owner/repo'
+inputs:
+  token:
+    description: 'github token to be used to access github API'
+    required: true
+    default: 'undefined'
+  repo:
+    description: 'repo to query issues ( =owner/repo_name )'
+    required: true
+    default: 'undefined/undefined'
+  author:
+    description: '[optional] query issues created by author'
+    required: false
+    default: ''
+  state:
+    description: '[optional] query issues that are in state'
+    required: false
+    default: 'OPEN'
+outputs:
+  issue_list:
+    description: 'a string contains a json array'
+  error_msg:
+    description: 'error message if issue_list is empty'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.token }}
+    - ${{ inputs.repo }}
+    - ${{ inputs.author }}
+    - ${{ inputs.state }}
