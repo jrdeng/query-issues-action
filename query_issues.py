@@ -156,7 +156,6 @@ def query_issues(token, repo_owner, repo_name, issue_author = None, state = 'OPE
 
 
 def main():
-    output = '[]'
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'ht:r:a:s:', ['help', 'token=', 'repo=', 'author=', 'state='])
     except getopt.GetoptError as err:
@@ -172,14 +171,14 @@ def main():
             usage()
             exit()
         elif o in ('-t', '--token'):
-            token = a
+            token = a if a != 'undefined' else None
         elif o in ('-r', '--repo'):
             kv = a.split('/')
             if len(kv) == 2:
                 owner = kv[0] if kv[0] != 'undefined' else None
                 repo = kv[1] if kv[1] != 'undefined' else None
         elif o in ('-a', '--author'):
-            author = a if a != '*' else None
+            author = a if a != '' else None
         elif o in ('-s', '--state'):
             state = a # TODO handle invalide state
         else:
@@ -187,7 +186,7 @@ def main():
             assert False, 'unhandled option'
     if token is None:
         usage()
-        set_error_output_and_exit('token must be set')
+        set_error_output_and_exit('token must be set via -t')
     if owner is None or repo is None:
         usage()
         set_error_output_and_exit('owner/repo_name must be set via -r')
