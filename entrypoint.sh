@@ -1,4 +1,4 @@
-#!/bin/sh -l
+#!/bin/sh
 
 echo ::set-output name=debug::ARGS: \("$1", "$2", "$3", "$4"\)
 
