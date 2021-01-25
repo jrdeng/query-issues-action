@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: test action
+    steps:
+      - name: use action
+        id: my-action
+        uses: jrdeng/query-issues-action@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repo: jrdeng/jrdeng.github.io
+          author: jrdeng
+
+      - name: store output
+        run: |
+          echo ${{ steps.my-action.outputs.error_msg }}
+          echo ${{ steps.my-action.outputs.issue_list }}
