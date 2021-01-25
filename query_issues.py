@@ -34,7 +34,8 @@ def usage():
 
 
 def set_output_for_github_action(key, value):
-    print('::set-output name={}::{}'.format(key, value))
+    formatted_value = value.replace('\n', '%0a').replace('\r', '%0d')
+    print('::set-output name={}::{}'.format(key, formatted_value))
 
 
 def set_error_output_and_exit(msg):
