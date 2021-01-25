@@ -17,7 +17,7 @@ jobs:
           repo: jrdeng/jrdeng.github.io
           author: jrdeng
 
-      - name: store output
+      - name: check output
         run: |
           echo ${{ steps.my-action.outputs.error_msg }}
           echo ${{ steps.my-action.outputs.issue_list }}
