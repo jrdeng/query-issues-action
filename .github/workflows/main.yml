@@ -20,4 +20,6 @@ jobs:
       - name: check output
         run: |
           echo ${{ steps.my-action.outputs.error_msg }}
-          echo ${{ steps.my-action.outputs.issue_list }}
+          echo ${{ steps.my-action.outputs.issue_list }} > issues.json
+          pwd
+          ls
