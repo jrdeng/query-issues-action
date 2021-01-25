@@ -193,7 +193,7 @@ def main():
 
     print('query_issues({}, {}, {}, {}, {})'.format(token, owner, repo, author, state))
     results = query_issues(token, owner, repo, author, state)
-    set_output_for_github_action('issue_list', json.dumps(results, ensure_ascii=False))
+    set_output_for_github_action('issue_list', json.dumps(results, ensure_ascii=True))
     set_output_for_github_action('error_msg', 'OK')
 
 if __name__ == '__main__':
