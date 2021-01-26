@@ -31,17 +31,24 @@ def usage():
     print('\t-r|--repo REPO\t\trepo to query issues ( owner/repo_name )')
     print('\t-a|--author AUTHOR\t[optional] query issues created by AUTHOR')
     print('\t-s|--state STATE\t[optional] query issues that are in state STATE, default to "OPEN"')
+    print('\t-f|--file FILE\ta file to store the issues in json format')
 
 
-def set_output_for_github_action(key, value):
+def github_action_set_debug_msg(msg):
+    print('::debug::{}'.format(msg))
+
+
+def github_action_set_error_msg(msg):
+    print('::error::{}'.format(msg))
+
+
+def github_action_set_output(key, value):
     print('::set-output name={}::{}'.format(key, value))
 
 
-def set_error_output_and_exit(msg):
-    # set empty result
-    set_output_for_github_action('issue_list', '[]')
-    # set error message
-    set_output_for_github_action('error_msg', msg)
+def log_error_and_exit(msg):
+    # set error message, no output file generated
+    github_action_set_error_msg(msg)
     exit(2)
 
 
@@ -55,16 +62,16 @@ def post(url, headers, payload):
     try:
         r = requests.post(url, headers=headers, json=payload)
         if r.status_code != 200:
-            set_error_output_and_exit(r.json())
+            log_error_and_exit(r.json())
         #print(r.json())
         data = r.json()['data']
         if data is None:
             # should be error
-            set_error_output_and_exit(r.json())
+            log_error_and_exit(r.json())
         return data
     except Exception as ex:
         # timeout
-        set_error_output_and_exit(ex)
+        log_error_and_exit(ex)
 
 
 def query_issues(token, repo_owner, repo_name, issue_author = None, state = 'OPEN'):
@@ -133,7 +140,7 @@ def query_issues(token, repo_owner, repo_name, issue_author = None, state = 'OPE
         # error handling
         repository = data['repository']
         if repository is None:
-            set_error_output_and_exit('repostory does not exist')
+            log_error_and_exit('repostory does not exist')
 
         # pase issues
         issues = repository['issues']
@@ -151,21 +158,21 @@ def query_issues(token, repo_owner, repo_name, issue_author = None, state = 'OPE
         has_next_page = page_info['hasNextPage']
         print('has_next_page: {}'.format(has_next_page))
 
-    print('DONE')
     return issue_list
 
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'ht:r:a:s:', ['help', 'token=', 'repo=', 'author=', 'state='])
+        opts, args = getopt.getopt(sys.argv[1:], 'ht:r:a:s:f:', ['help', 'token=', 'repo=', 'author=', 'state=', 'file='])
     except getopt.GetoptError as err:
         usage()
-        set_error_output_and_exit(err)
+        log_error_and_exit(err)
     token = None
     owner = None
     repo = None
     author = None
     state = 'OPEN'
+    output_file = None
     for o, a in opts:
         if o == '-h':
             usage()
@@ -181,20 +188,28 @@ def main():
             author = a if a != '' else None
         elif o in ('-s', '--state'):
             state = a # TODO handle invalide state
+        elif o in ('-f', '--file'):
+            output_file = a if a != '' else None
         else:
             usage()
             assert False, 'unhandled option'
     if token is None:
         usage()
-        set_error_output_and_exit('token must be set via -t')
+        log_error_and_exit('token must be set via -t')
     if owner is None or repo is None:
         usage()
-        set_error_output_and_exit('owner/repo_name must be set via -r')
+        log_error_and_exit('owner/repo_name must be set via -r')
 
-    print('query_issues({}, {}, {}, {}, {})'.format(token, owner, repo, author, state))
+    github_action_set_debug_msg('query_issues({}, {}, {}, {}, {})'.format(token, owner, repo, author, state))
     results = query_issues(token, owner, repo, author, state)
-    set_output_for_github_action('issue_list', json.dumps(results, ensure_ascii=True))
-    set_output_for_github_action('error_msg', 'OK')
+    issue_json_array = json.dumps(results, ensure_ascii=False)
+    github_action_set_debug_msg('issue_list={}'.format(issue_json_array))
+    # store output file
+    if output_file:
+        with open(output_file, 'w') as out:
+            out.write(issue_json_array)
+
 
 if __name__ == '__main__':
     main()
+    github_action_set_debug_msg('DONE')

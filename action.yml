@@ -17,11 +17,10 @@ inputs:
     description: '[optional] query issues that are in state'
     required: false
     default: 'OPEN'
-outputs:
-  issue_list:
-    description: 'a string contains a json array'
-  error_msg:
-    description: 'error message if issue_list is empty'
+  output_json:
+    description: '[out] a file to store the issues in json format'
+    required: false
+    default: ''
 runs:
   using: 'docker'
   image: 'Dockerfile'
@@ -30,3 +29,4 @@ runs:
     - ${{ inputs.repo }}
     - ${{ inputs.author }}
     - ${{ inputs.state }}
+    - ${{ inputs.output_json }}
