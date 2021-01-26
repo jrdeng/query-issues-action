@@ -16,10 +16,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           repo: jrdeng/jrdeng.github.io
           author: jrdeng
-          output_json: /issues.json
+          output_json: ./issues.json
 
       - name: check output
         run: |
           pwd
-          ls -l /issues.json
-          cat /issues.json
+          ls -l
+          cat ./issues.json
