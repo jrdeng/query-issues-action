@@ -20,7 +20,7 @@ a github action to query issues from github repo. issues will be stored in a fil
 
 [optional] query issues that are in state, default to `'OPEN'`
 
-### `repo`
+### `output_json`
 
 [optional][out] a file to store the issues in json format
 
